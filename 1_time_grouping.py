@@ -2,6 +2,50 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import count, col, from_unixtime, first, date_format, udf, avg, desc, window
 from collections import defaultdict
 from datasets import Dataset, DatasetDict
+from pyspark.ml.feature import VectorAssembler, StandardScaler
+from pyspark.sql.types import NumericType, ArrayType, DoubleType
+from pyspark.ml import Pipeline  # Import Pipeline
+
+def scale(df):
+    # Identify numeric columns
+    numeric_cols = ["n_invocations","avg_loc","avg_cyc_complexity","avg_num_of_imports","avg_argument_size"]
+
+    # Assemble numeric columns into a feature vector
+    assembler = VectorAssembler(inputCols=numeric_cols, outputCol="features")
+
+    # Scale the features
+    scaler = StandardScaler(inputCol="features", outputCol="scaled_features")
+
+    # Create a Pipeline that includes both steps
+    pipeline = Pipeline(stages=[assembler, scaler])
+
+    # Fit the pipeline to the data
+    model = pipeline.fit(df)
+
+    # Transform the data using the model
+    scaled_df = model.transform(df)
+
+    # Unpack the scaled features vector to individual columns
+    unpack_vector_udf = udf(lambda vector: vector.toArray().tolist(), ArrayType(DoubleType()))
+    scaled_df = scaled_df.withColumn("scaled", unpack_vector_udf("scaled_features"))
+
+    # Assign unpacked values back to respective columns
+    for i, col_name in enumerate(numeric_cols):
+        scaled_df = scaled_df.withColumn(col_name, col("scaled").getItem(i))
+
+    # Drop the original vector columns
+    scaled_df = scaled_df.drop("features", "scaled_features", "scaled")
+
+    # Save the scaled data to a new CSV file
+    #output_path = "data/rescaled"
+    #scaled_df.coalesce(1).write.csv(output_path, header=True, mode="overwrite")
+
+    # Save the scaler model to a directory
+    scaler_model_path = "helpers/scaler"
+    model.stages[1].write().overwrite().save(scaler_model_path)
+
+    return scaled_df
+
 
 def time_window(input_csv, output_csv):
     # input_csv: file csv to group
@@ -80,6 +124,11 @@ def time_window(input_csv, output_csv):
     result_300 = result_300.drop("window")
     result_300 = result_300.orderBy("timestamp")
 
+    # scaling
+    result_30 = scale(result_30)
+    result_60 = scale(result_60)
+    result_300 = scale(result_300)
+
     result_30.coalesce(1).write.csv(output_csv+"/30", header=True, mode="overwrite")
     result_60.coalesce(1).write.csv(output_csv+"/60", header=True, mode="overwrite")
     result_300.coalesce(1).write.csv(output_csv+"/300", header=True, mode="overwrite")
@@ -127,9 +176,9 @@ def time_window(input_csv, output_csv):
     })
 
     # Push to Hugging Face Hub
-    dataset_dict_30.push_to_hub("anastasiafrosted/endpoint3_30")
-    dataset_dict_60.push_to_hub("anastasiafrosted/endpoint3_60")
-    dataset_dict_300.push_to_hub("anastasiafrosted/endpoint3_300")
+    dataset_dict_30.push_to_hub("anastasiafrosted/globus_30")
+    dataset_dict_60.push_to_hub("anastasiafrosted/globus_60")
+    dataset_dict_300.push_to_hub("anastasiafrosted/globus_300")
 
     # Stop Spark session
     spark.stop()
@@ -137,4 +186,4 @@ def time_window(input_csv, output_csv):
 
 if __name__ == "__main__":
     #time_window("data/globus/globus.csv", "data/globus")
-    time_window("data/endpoints/endpoint3/e3.csv", "data/endpoints/endpoint3")
+    time_window("data/globus/globus.csv", "data/globus/")

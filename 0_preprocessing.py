@@ -1,51 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql import Row
 from pyspark.sql.types import LongType
-from pyspark.ml.feature import VectorAssembler, StandardScaler
-from pyspark.sql.types import NumericType, ArrayType, DoubleType
-from pyspark.ml import Pipeline  # Import Pipeline
 from pyspark.sql.functions import count, col, from_unixtime, first, date_format, udf, avg, desc
-#import numpy as np
-
-def scale_(df):
-    # Identify numeric columns
-    numeric_cols = ["invocations_per_hour","avg_loc","avg_cyc_complexity","avg_num_of_imports","avg_argument_size",
-                    "avg_total_execution_time","avg_system_processing_time"]
-
-    # Assemble numeric columns into a feature vector
-    assembler = VectorAssembler(inputCols=numeric_cols, outputCol="features")
-
-    # Scale the features
-    scaler = StandardScaler(inputCol="features", outputCol="scaled_features")
-
-    # Create a Pipeline that includes both steps
-    pipeline = Pipeline(stages=[assembler, scaler])
-
-    # Fit the pipeline to the data
-    model = pipeline.fit(df)
-
-    # Transform the data using the model
-    scaled_df = model.transform(df)
-
-    # Unpack the scaled features vector to individual columns
-    unpack_vector_udf = udf(lambda vector: vector.toArray().tolist(), ArrayType(DoubleType()))
-    scaled_df = scaled_df.withColumn("scaled", unpack_vector_udf("scaled_features"))
-
-    # Assign unpacked values back to respective columns
-    for i, col_name in enumerate(numeric_cols):
-        scaled_df = scaled_df.withColumn(col_name, col("scaled").getItem(i))
-
-    # Drop the original vector columns
-    scaled_df = scaled_df.drop("features", "scaled_features", "scaled")
-
-    # Save the scaled data to a new CSV file
-    output_path = "data/rescaled"
-    scaled_df.coalesce(1).write.csv(output_path, header=True, mode="overwrite")
-
-    # Save the scaler model to a directory
-    scaler_model_path = "helpers/scaler"
-    model.stages[1].write().overwrite().save(scaler_model_path)
-
 
 def process():
     # Step 0: Initialize Spark session
@@ -55,13 +11,13 @@ def process():
 
     # Step 1: Load the CSV files into DataFrames
     # ENDPOINTS
-    endpoints = spark.read.csv("data/endpoints.csv", header=True, inferSchema=True)
+    endpoints = spark.read.csv("data/globus/endpoints.csv", header=True, inferSchema=True)
     # FUNCTIONS
-    functions = spark.read.csv("data/functions.csv", header=True, inferSchema=True)
+    functions = spark.read.csv("data/globus/functions.csv", header=True, inferSchema=True)
     # Drop
     functions = functions.drop('function_body_uuid')
     # TASKS
-    tasks = spark.read.csv("data/tasks.csv", header=True, inferSchema=True)
+    tasks = spark.read.csv("data/globus/tasks.csv", header=True, inferSchema=True)
     # Drop
     tasks = tasks.drop('anonymized_user_uuid')
 
@@ -94,7 +50,7 @@ def process():
             queue_time=row['execution_start'] - row['waiting_for_launch'], # time between the task assigned to a worker and the execution start
             execution_time=row['execution_end'] - row['execution_start'], # time between the task execution start and end
             results_time=row['result_received'] - row['execution_end'],
-            total_execution_time=row['result_received'] - row['received'], # time between the task arriving and the results being reported, to the could platform
+            total_execution_time=row['result_received'] - row['received'], # time between the task arriving and the results.csv being reported, to the could platform
 
             argument_size=row['argument_size'],
 
@@ -130,8 +86,11 @@ def process():
             #avg("scheduling_time").alias("avg_scheduling_time")  # Media del tempo di scheduling
         )
     )
+
     # more Ordering
     result = result.orderBy("arrival_timestamp")
+
+    # save
     result.coalesce(1).write.csv("data/globus", header=True, mode="overwrite")
 
     # Stop Spark session
