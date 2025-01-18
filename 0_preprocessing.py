@@ -59,9 +59,6 @@ def process():
             cyc_complexity=row['cyc_complexity'],
             num_of_imports=row['num_of_imports'],
 
-            # from endpoints
-            **{f"e_type_{e_type.replace('.', '_')}": 1 if row['endpoint_type'] == e_type else 0 for e_type in unique_endpoint_type},  # One-hot encoding for all unique endpoint types
-            **{f"e_vers_{e_vers.replace('.', '_')}": 1 if row['endpoint_version'] == e_vers else 0 for e_vers in unique_endpoint_version}  # One-hot encoding for all unique endpoint versions
         )
     ])
 
