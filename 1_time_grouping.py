@@ -7,6 +7,7 @@ from pyspark.sql.types import NumericType, ArrayType, DoubleType
 from pyspark.ml import Pipeline  # Import Pipeline
 from pyspark.sql.window import Window
 
+
 def scale(df):
     # Identify numeric columns
     numeric_cols = ["n_invocations","avg_loc","avg_cyc_complexity","avg_num_of_imports","avg_argument_size"]
@@ -252,11 +253,11 @@ def time_window(input_csv, data_name):
     })
 
     # Push to Hugging Face Hub
-    dataset_dict_60.push_to_hub("anastasiafrosted/"+data_name+"_60")
+    #dataset_dict_60.push_to_hub("anastasiafrosted/"+data_name+"_60")
     dataset_dict_120.push_to_hub("anastasiafrosted/"+data_name+"_120")
-    dataset_dict_300.push_to_hub("anastasiafrosted/"+data_name+"_300")
-    dataset_dict_3600.push_to_hub("anastasiafrosted/"+data_name+"_3600")
-    dataset_dict_86400.push_to_hub("anastasiafrosted/"+data_name+"_86400")
+    #dataset_dict_300.push_to_hub("anastasiafrosted/"+data_name+"_300")
+    #dataset_dict_3600.push_to_hub("anastasiafrosted/"+data_name+"_3600")
+    #dataset_dict_86400.push_to_hub("anastasiafrosted/"+data_name+"_86400")
 
     # Stop Spark session
     spark.stop()
@@ -265,4 +266,4 @@ def time_window(input_csv, data_name):
 if __name__ == "__main__":
     #time_window("data/globus/globus.csv", "data/globus")
     #time_window("data/globus/globus.csv", "data/globus/")
-    time_window("data/globus/globus.csv", "globus")
+    time_window("data/endpoints/endpoint1/e1.csv", "endpoint1")
