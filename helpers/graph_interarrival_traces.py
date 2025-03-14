@@ -40,10 +40,10 @@ def plot_cumulative_mean(file_paths, labels, output_path):
 if __name__ == "__main__":
     # Percorsi dei file CSV
     file_paths = [
-        'data/traces/endpoint0/functions/inter_arrivals0.csv',
-        'data/traces/endpoint0/functions/inter_arrivals1.csv',
-        'data/traces/endpoint1/functions/inter_arrivals0.csv',
-        'data/traces/endpoint1/functions/inter_arrivals1.csv'
+        'data_globus/traces/endpoint0/functions/inter_arrivals0.csv',
+        'data_globus/traces/endpoint0/functions/inter_arrivals1.csv',
+        'data_globus/traces/endpoint1/functions/inter_arrivals0.csv',
+        'data_globus/traces/endpoint1/functions/inter_arrivals1.csv'
     ]
 
     # Etichette per le linee del grafico

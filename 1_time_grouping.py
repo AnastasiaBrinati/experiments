@@ -21,10 +21,10 @@ def scale(df):
     # Create a Pipeline that includes both steps
     pipeline = Pipeline(stages=[assembler, scaler])
 
-    # Fit the pipeline to the data
+    # Fit the pipeline to the data_globus
     model = pipeline.fit(df)
 
-    # Transform the data using the model
+    # Transform the data_globus using the model
     scaled_df = model.transform(df)
 
     # Unpack the scaled features vector to individual columns
@@ -38,8 +38,8 @@ def scale(df):
     # Drop the original vector columns
     scaled_df = scaled_df.drop("features", "scaled_features", "scaled")
 
-    # Save the scaled data to a new CSV file
-    #output_path = "data/rescaled"
+    # Save the scaled data_globus to a new CSV file
+    #output_path = "data_globus/rescaled"
     #scaled_df.coalesce(1).write.csv(output_path, header=True, mode="overwrite")
 
     # Save the scaler model to a directory
@@ -264,6 +264,6 @@ def time_window(input_csv, data_name):
 
 
 if __name__ == "__main__":
-    #time_window("data/globus/globus.csv", "data/globus")
-    #time_window("data/globus/globus.csv", "data/globus/")
-    time_window("data/endpoints/endpoint1/e1.csv", "endpoint1")
+    #time_window("data_globus/globus/globus.csv", "data_globus/globus")
+    #time_window("data_globus/globus/globus.csv", "data_globus/globus/")
+    time_window("data_globus/endpoints/endpoint1/e1.csv", "endpoint1")

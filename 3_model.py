@@ -80,4 +80,4 @@ np.save("timestamps.npy", timestamps)
 combined = np.column_stack((y_test, y_pred))
 # Create a DataFrame from the combined array
 df = pd.DataFrame(combined, columns=["actuals", "predictions"])
-df.to_csv("data/results.csv", index=False)
+df.to_csv("data_globus/results.csv", index=False)

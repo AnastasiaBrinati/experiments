@@ -8,7 +8,7 @@ def reverse_scaling(input_path, scaler_model_path):
         .appName("Reverse Scaling") \
         .getOrCreate()
 
-    # Load the scaled data
+    # Load the scaled data_globus
     df = spark.read.csv(input_path, header=True, inferSchema=True)
 
     # Load the saved StandardScalerModel
@@ -20,7 +20,7 @@ def reverse_scaling(input_path, scaler_model_path):
 
     # Reverse scaling for each column:
     features_to_inverse = ["actuals", "predictions"]
-    # select column 'n_invocations' corresponding index in the original scaled data
+    # select column 'n_invocations' corresponding index in the original scaled data_globus
     i = 0
     # actuals
     print(f"Reversing scaling for column: {features_to_inverse[0]}")
@@ -29,15 +29,15 @@ def reverse_scaling(input_path, scaler_model_path):
     print(f"Reversing scaling for column: {features_to_inverse[1]}")
     df = df.withColumn(features_to_inverse[1], col(features_to_inverse[1]) * std_dev[i] + mean[i]) #Reversing
 
-    # Save the reversed data to a CSV
-    df.coalesce(1).write.csv("data/results", header=True, mode="overwrite")
+    # Save the reversed data_globus to a CSV
+    df.coalesce(1).write.csv("data_globus/results", header=True, mode="overwrite")
 
     # Stop the Spark session
     spark.stop()
 
 
 if __name__ == "__main__":
-    scaled_csv_path = "data/results.csv"
+    scaled_csv_path = "data_globus/results.csv"
     scaler_model_path = "helpers/scaler/"
 
     # Step 2: Reverse the scaling

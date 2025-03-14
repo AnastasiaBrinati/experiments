@@ -3,7 +3,7 @@ import pandas as pd
 
 # Simulazione di un dataset con giorni e feature
 
-df = pd.read_csv("data/globus/300/globus.csv")
+df = pd.read_csv("data_globus/globus/300/globus.csv")
 timestamps = df["timestamp"].to_numpy()
 df.drop("timestamp", axis=1, inplace=True)
 

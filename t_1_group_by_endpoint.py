@@ -21,7 +21,7 @@ def group(limit, input_path, output_path):
     # Step 9: Get the top N most frequent endpoints
     top_endpoints = endpoint_frequency.limit(limit).select("endpoint_uuid").rdd.flatMap(lambda x: x).collect()
     for i in range(limit):
-        # Partition the data for the top N endpoints
+        # Partition the data_globus for the top N endpoints
         partition = df.filter(col("endpoint_uuid") == top_endpoints[i])
         partition = partition.drop("endpoint_uuid")
         # Save the partitions to separate CSV files
@@ -35,8 +35,8 @@ def group(limit, input_path, output_path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process and save top endpoints.")
     parser.add_argument("--limit", default=2, type=int, help="Number of top endpoints to process.")
-    parser.add_argument("--input_path", default="data/traces/all _endpoints_trace.csv", type=str, help="Base input path for CSV files.")
-    parser.add_argument("--output_path", default="data/traces", type=str, help="Base output path for CSV files.")
+    parser.add_argument("--input_path", default="data_globus/traces/all _endpoints_trace.csv", type=str, help="Base input path for CSV files.")
+    parser.add_argument("--output_path", default="data_globus/traces", type=str, help="Base output path for CSV files.")
     args = parser.parse_args()
 
     group(args.limit, args.input_path, args.output_path)

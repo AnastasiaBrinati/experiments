@@ -11,13 +11,13 @@ def process():
 
     # Step 1: Load the CSV files into DataFrames
     # ENDPOINTS
-    endpoints = spark.read.csv("data/endpoints.csv", header=True, inferSchema=True)
+    endpoints = spark.read.csv("data_globus/endpoints.csv", header=True, inferSchema=True)
     # FUNCTIONS
-    functions = spark.read.csv("data/functions.csv", header=True, inferSchema=True)
+    functions = spark.read.csv("data_globus/functions.csv", header=True, inferSchema=True)
     # Drop
     #functions = functions.drop('function_body_uuid')
     # TASKS
-    tasks = spark.read.csv("data/tasks.csv", header=True, inferSchema=True)
+    tasks = spark.read.csv("data_globus/tasks.csv", header=True, inferSchema=True)
     # Drop
     #tasks = tasks.drop('anonymized_user_uuid')
 
@@ -90,7 +90,7 @@ def process():
     # Ora voglio fare un altro df o rdd in cui raccolgo sempre per endpoint però vado ad usare una finestra per raccogliere
 
     # save
-    result.coalesce(1).write.csv("data/globus/prove", header=True, mode="overwrite")
+    result.coalesce(1).write.csv("data_globus/globus/prove", header=True, mode="overwrite")
 
     # Stop Spark session
     spark.stop()

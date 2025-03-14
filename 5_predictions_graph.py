@@ -4,7 +4,7 @@ import pandas as pd
 
 timestamps = np.load("timestamps.npy", allow_pickle=True)
 
-df = pd.read_csv("data/results/results.csv")
+df = pd.read_csv("data_globus/results/results.csv")
 y_act = df["actuals"]
 y_pred = df["predictions"]
 

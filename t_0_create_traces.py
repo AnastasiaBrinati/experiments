@@ -11,11 +11,11 @@ def create_traces():
 
     # Step 1: Load the CSV files into DataFrames
     # FUNCTIONS
-    functions = spark.read.csv("data/functions.csv", header=True, inferSchema=True)
+    functions = spark.read.csv("data_globus/functions.csv", header=True, inferSchema=True)
     # Drop
     functions = functions.drop('function_body_uuid')
     # TASKS
-    tasks = spark.read.csv("data/tasks.csv", header=True, inferSchema=True)
+    tasks = spark.read.csv("data_globus/tasks.csv", header=True, inferSchema=True)
     # Drop
     tasks = tasks.drop('anonymized_user_uuid')
 
@@ -52,7 +52,7 @@ def create_traces():
     result = df.orderBy("arrival_timestamp")
 
     # save
-    result.coalesce(1).write.csv("data/traces", header=True, mode="overwrite")
+    result.coalesce(1).write.csv("data_globus/traces", header=True, mode="overwrite")
 
     # Stop Spark session
     spark.stop()

@@ -34,8 +34,8 @@ def get_arrivals(input_csv, output_file, rates_file):
         )
     )
 
-    # Multiply the 'n_arrivals' by 1000 (as requested)
-    result_10 = result_10.withColumn("n_arrivals", col("n_arrivals")*10 + 100)
+    # Increment the 'n_arrivals'
+    result_10 = result_10.withColumn("n_arrivals", col("n_arrivals")*10 + 1000)
 
     # Add a `timestamp` column based on the start of the time window
     result_10 = result_10.withColumn("timestamp", col("window.start"))
@@ -50,7 +50,7 @@ def get_arrivals(input_csv, output_file, rates_file):
     result_10_pd = result_10.toPandas()
 
     # Definiamo il numero di righe per ogni finestra (12 righe da 10s = 120s)
-    WINDOW_SIZE_ROWS = 12
+    WINDOW_SIZE_ROWS = 1
     WINDOW_DURATION_SEC = 120
 
     # Raggruppiamo ogni 12 righe e sommiamo gli arrivi
@@ -90,6 +90,6 @@ def get_arrivals(input_csv, output_file, rates_file):
 if __name__ == "__main__":
     for i in range(0,2):
         print(f"working on endpoint: {i}")
-        get_arrivals("data/traces/endpoint"+str(i)+"/e"+str(i)+".csv",
-                     "data/traces/endpoint"+str(i)+"/synthetic/inter_arrivals"+str(i)+".csv",
-                     "data/traces/endpoint"+str(i)+"/synthetic/arrival_rates_120s.csv")
+        get_arrivals("data_globus/traces/endpoint"+str(i)+"/e"+str(i)+".csv",
+                     "data_globus/traces/endpoint"+str(i)+"/synthetic/inter_arrivals"+str(i)+".csv",
+                     "data_globus/traces/endpoint"+str(i)+"/synthetic/arrival_rates_120s.csv")

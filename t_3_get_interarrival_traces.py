@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 def generate_interarrival_times(data):
 
-    # Step 1: Load the data into a DataFrame
+    # Step 1: Load the data_globus into a DataFrame
     df = pd.DataFrame(data)
 
     # Step 2:
@@ -25,8 +25,8 @@ def generate_interarrival_times(data):
         interarrival_times.append(((actual_arrival - previous_arrival)/ 1e9) / 100)
         previous_arrival = actual_arrival
 
-    pd.Series(interarrival_times).to_csv('data/traces/endpoint0/inter_arrivals0.csv', header=False, index=False)
+    pd.Series(interarrival_times).to_csv('data_globus/traces/endpoint0/inter_arrivals0.csv', header=False, index=False)
 
 if __name__ == "__main__":
-    data = pd.read_csv("data/traces/endpoint0/e0.csv")
+    data = pd.read_csv("data_globus/traces/endpoint0/e0.csv")
     generate_interarrival_times(data)
