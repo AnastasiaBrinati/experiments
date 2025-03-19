@@ -6,11 +6,11 @@ def split_csv(input_file, output1, output2):
     df = pd.read_csv(input_file)
 
     # Calculate split point
-    mid_index = len(df) // 2
+    mid_index = len(df) // 10
 
     # Split the dataframe
     df_part1 = df.iloc[:mid_index]
-    df_part2 = df.iloc[mid_index:]
+    df_part2 = df.iloc[mid_index:mid_index*2]
 
     # Save to new files
     df_part1.to_csv(output1, index=False)

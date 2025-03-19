@@ -33,9 +33,9 @@ def main(input_file, rates_output, interarrivals_output):
     spark = SparkSession.builder.appName("ArrivalProcessing").getOrCreate()
     df = spark.read.option("header", "true").csv(input_file)
     df = df.withColumn("Arrivals", col(df.columns[0]).cast("double") * 10)
-    df = df.withColumn("Rates", col("Arrivals") / STEP_LEN)
+    df = df.withColumn("Rate", col("Arrivals") / STEP_LEN)
 
-    rates_pd = df.select("Rates").toPandas()
+    rates_pd = df.select("Rate").toPandas()
     rates_pd.to_csv(rates_output, index=False, header=True)
 
     nArrivals = df.select("Arrivals").rdd.map(lambda row: row["Arrivals"]).collect()
@@ -44,7 +44,6 @@ def main(input_file, rates_output, interarrivals_output):
     count = 0
     rng = np.random.default_rng(SEED)
 
-    print("Starting on times.")
     for i, arrivals in enumerate(nArrivals):
         t0 = STEP_LEN * i
         t1 = t0 + STEP_LEN
@@ -53,22 +52,15 @@ def main(input_file, rates_output, interarrivals_output):
 
     inter_arrival_times = np.diff(arrival_times)
     inter_arrival_pd = pd.DataFrame(inter_arrival_times, columns=["Interarrival"])
-    inter_arrival_pd.to_csv(interarrivals_output, index=False, header=True)
+    inter_arrival_pd.to_csv(interarrivals_output, index=False, header=False)
 
     spark.stop()
-    print(f"Generated {len(nArrivals)} rates.")
-
+    print(f"Generated {len(rates_pd)} rates.")
+    print(f"Generated {len(inter_arrival_times)} times.")
 
 if __name__ == "__main__":
     input_file = "data/trace/debs15_2.csv"
-    rates_output = "../faas-offloading-sim/models/training/debs15_rates_2.csv"
-    interarrivals_output = "../faas-offloading-sim/traces/synthetic/debs15_interarrivals_2.csv"
+    #rates_output = "../faas-offloading-sim/models/training/debs15_rates_1_even.csv"
+    rates_output = "data/trace/debs15_2_rates.csv"
+    interarrivals_output = "data/trace/debs15_2_interarrivals.csv"
     main(input_file, rates_output, interarrivals_output)
-
-    """
-    rates = "data/trace/debs15_rates.csv"
-    rates = spark.read.option("header", "true").csv(rates)
-    inter_arrival_times = "data/trace/debs15_interarrivals.csv"
-    inter_arrival_times = spark.read.option("header", "true").csv(inter_arrival_times)
-    graph(inter_arrival_times, rates, "data/trace/img/debs15.png")
-    """

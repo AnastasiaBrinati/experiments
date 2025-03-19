@@ -17,8 +17,12 @@ def generate_rates(data, window_size=120):
 
     # Step 4: Calcolare il tasso di arrivo (eventi per secondo)
     rates = counts.value_counts().sort_index() / window_size
-    pd.Series(rates).to_csv('data_globus/traces/endpoint0/globus0_rates.csv', header=False, index=False)
+    pd.Series(rates).to_csv('data/trace/prova_rates.csv', header=False, index=False)
 
 if __name__ == "__main__":
-    data = pd.read_csv("data_globus/traces/endpoint0/inter_arrivals0.csv")
-    generate_rates(data)
+    data = pd.read_csv("../faas-offloading-sim/traces/synthetic/debs15_interarrivals_2.csv")
+    # Calculate split point
+    mid_index = len(data) // 10
+    # Split the dataframe
+    df_part1 = data.iloc[:mid_index]
+    generate_rates(df_part1)
